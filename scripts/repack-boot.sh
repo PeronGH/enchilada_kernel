@@ -3,7 +3,10 @@
 #
 # Usage: repack-boot.sh <kernel> <stock-boot> <output> [--magisk <magisk-dir>]
 #
-# magisk-dir must contain: libmagiskinit.so, libmagisk.so, libinit-ld.so, stub.apk
+# magisk-dir must contain: libmagiskboot.so, libmagiskinit.so, libmagisk.so,
+#                          libinit-ld.so, stub.apk
+#
+# Set MAGISKBOOT to override the path to magiskboot binary.
 
 set -euo pipefail
 
@@ -16,11 +19,20 @@ if [ "${4:-}" = "--magisk" ]; then
   MAGISK_DIR="$5"
 fi
 
+# Find magiskboot: explicit env, magisk-dir, or PATH
+if [ -z "${MAGISKBOOT:-}" ]; then
+  if [ -n "$MAGISK_DIR" ] && [ -x "$MAGISK_DIR/libmagiskboot.so" ]; then
+    MAGISKBOOT="$MAGISK_DIR/libmagiskboot.so"
+  else
+    MAGISKBOOT="magiskboot"
+  fi
+fi
+
 WORKDIR=$(mktemp -d)
 trap 'rm -rf "$WORKDIR"' EXIT
 cd "$WORKDIR"
 
-magiskboot unpack "$STOCK_BOOT"
+"$MAGISKBOOT" unpack "$STOCK_BOOT"
 cp "$KERNEL" kernel
 
 if [ -n "$MAGISK_DIR" ]; then
@@ -30,19 +42,19 @@ if [ -n "$MAGISK_DIR" ]; then
   cp "$MAGISK_DIR/libinit-ld.so" init-ld
   cp "$MAGISK_DIR/stub.apk" stub.apk
 
-  magiskboot compress=xz magisk magisk.xz
-  magiskboot compress=xz stub.apk stub.xz
-  magiskboot compress=xz init-ld init-ld.xz
+  "$MAGISKBOOT" compress=xz magisk magisk.xz
+  "$MAGISKBOOT" compress=xz stub.apk stub.xz
+  "$MAGISKBOOT" compress=xz init-ld init-ld.xz
 
   cat > config <<EOF
 KEEPVERITY=false
 KEEPFORCEENCRYPT=false
 RECOVERYMODE=false
 VENDORBOOT=false
-SHA1=$(magiskboot sha1 "$STOCK_BOOT")
+SHA1=$("$MAGISKBOOT" sha1 "$STOCK_BOOT")
 EOF
 
-  magiskboot cpio ramdisk.cpio \
+  "$MAGISKBOOT" cpio ramdisk.cpio \
     "add 0750 init magiskinit" \
     "mkdir 0750 overlay.d" \
     "mkdir 0750 overlay.d/sbin" \
@@ -55,4 +67,4 @@ EOF
     "add 000 .backup/.magisk config"
 fi
 
-magiskboot repack "$STOCK_BOOT" "$OUTPUT"
+"$MAGISKBOOT" repack "$STOCK_BOOT" "$OUTPUT"

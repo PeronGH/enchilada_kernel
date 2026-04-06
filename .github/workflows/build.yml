@@ -44,17 +44,24 @@ jobs:
           name: Image.gz-dtb
           path: kernel/out/arch/arm64/boot/Image.gz-dtb
 
-      - name: Setup magiskboot
+      - name: Setup Magisk
         run: |
           gh release download v30.7 --repo topjohnwu/Magisk --pattern 'Magisk-*.apk' --dir /tmp/magisk
-          unzip -o /tmp/magisk/Magisk-*.apk lib/x86_64/libmagiskboot.so -d /tmp/magisk
-          install -m755 /tmp/magisk/lib/x86_64/libmagiskboot.so /usr/local/bin/magiskboot
+          unzip -o /tmp/magisk/Magisk-*.apk -d /tmp/magisk \
+            lib/x86_64/libmagiskboot.so \
+            lib/arm64-v8a/libmagiskinit.so \
+            lib/arm64-v8a/libmagisk.so \
+            lib/arm64-v8a/libinit-ld.so \
+            assets/stub.apk
+          chmod 755 /tmp/magisk/lib/x86_64/libmagiskboot.so
+          cp /tmp/magisk/assets/stub.apk /tmp/magisk/lib/arm64-v8a/
           gh release download stock-boot --pattern boot.img --dir /tmp
         env:
           GH_TOKEN: ${{ github.token }}
 
       - name: Repack boot.img
         run: |
+          MAGISKBOOT=/tmp/magisk/lib/x86_64/libmagiskboot.so \
           scripts/repack-boot.sh kernel/out/arch/arm64/boot/Image.gz-dtb \
             /tmp/boot.img boot.img
 
@@ -64,17 +71,9 @@ jobs:
           name: boot.img
           path: boot.img
 
-      - name: Setup Magisk payload
-        run: |
-          unzip -o /tmp/magisk/Magisk-*.apk -d /tmp/magisk \
-            lib/arm64-v8a/libmagiskinit.so \
-            lib/arm64-v8a/libmagisk.so \
-            lib/arm64-v8a/libinit-ld.so \
-            assets/stub.apk
-          cp /tmp/magisk/assets/stub.apk /tmp/magisk/lib/arm64-v8a/
-
       - name: Repack boot.img (Magisk)
         run: |
+          MAGISKBOOT=/tmp/magisk/lib/x86_64/libmagiskboot.so \
           scripts/repack-boot.sh kernel/out/arch/arm64/boot/Image.gz-dtb \
             /tmp/boot.img boot-magisk.img \
             --magisk /tmp/magisk/lib/arm64-v8a
