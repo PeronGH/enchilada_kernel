@@ -10,11 +10,6 @@ jobs:
           submodules: true
           fetch-depth: 1
 
-      - name: Apply patches
-        run: |
-          cd kernel
-          git apply "$GITHUB_WORKSPACE"/patches/*.patch
-
       - name: Install deps
         run: |
           sudo apt-get update
