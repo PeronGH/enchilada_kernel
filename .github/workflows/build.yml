@@ -2,26 +2,22 @@ name: Build Kernel
 on: [push, workflow_dispatch]
 jobs:
   build:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-22.04-arm
     steps:
       - name: Install deps
         run: |
           sudo apt-get update
           sudo apt-get install -y bc bison build-essential cpio device-tree-compiler \
-            flex libelf-dev libssl-dev lz4 python3
+            flex kmod libelf-dev libssl-dev libtfm-dev openssl python3
 
       - name: Clone kernel
         run: git clone --depth=1 -b lineage-23.2-4.19 https://github.com/EdwinMoq/android_kernel_oneplus_sdm845 kernel
-
-      - name: Fix OpenSSL 3.x
-        run: sed -i 's|#include <openssl/engine.h>||' kernel/scripts/extract-cert.c kernel/scripts/sign-file.c
 
       - name: Build
         run: |
           cd kernel
           make -j$(nproc) O=out ARCH=arm64 vendor/enchilada_defconfig
-          ./scripts/config --file out/.config -d CC_WERROR
-          make -j$(nproc) O=out ARCH=arm64 KCFLAGS="-w"
+          make -j$(nproc) O=out ARCH=arm64
 
       - name: Upload
         uses: actions/upload-artifact@v4
