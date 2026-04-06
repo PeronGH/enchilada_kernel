@@ -41,7 +41,7 @@ jobs:
       - name: Upload kernel image
         uses: actions/upload-artifact@v7
         with:
-          name: Image.gz-dtb
+          name: kernel
           path: kernel/out/arch/arm64/boot/Image.gz-dtb
 
       - name: Setup Magisk
@@ -61,7 +61,7 @@ jobs:
       - name: Upload boot.img
         uses: actions/upload-artifact@v7
         with:
-          name: boot.img
+          name: boot
           path: boot.img
 
       - name: Repack boot.img (Magisk)
@@ -72,5 +72,5 @@ jobs:
       - name: Upload boot.img (Magisk)
         uses: actions/upload-artifact@v7
         with:
-          name: boot-magisk.img
+          name: boot-magisk
           path: boot-magisk.img
