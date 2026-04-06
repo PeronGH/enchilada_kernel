@@ -33,8 +33,28 @@ jobs:
             CROSS_COMPILE=aarch64-linux-android- \
             CROSS_COMPILE_ARM32=arm-linux-androideabi- \
 
-      - name: Upload
+      - name: Package with AnyKernel3
+        run: |
+          git clone --depth=1 https://github.com/osm0sis/AnyKernel3
+          sed -i AnyKernel3/anykernel.sh \
+            -e 's/device.name1=.*/device.name1=enchilada/' \
+            -e 's/device.name2=.*/device.name2=/' \
+            -e 's/device.name3=.*/device.name3=/' \
+            -e 's/device.name4=.*/device.name4=/' \
+            -e 's/device.name5=.*/device.name5=/' \
+            -e 's|kernel.string=.*|kernel.string=Custom Kernel for OnePlus 6|'
+          cp kernel/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/
+          cd AnyKernel3
+          zip -r9 ../AnyKernel3-enchilada.zip * -x .git .github README.md
+
+      - name: Upload kernel image
         uses: actions/upload-artifact@v4
         with:
-          name: kernel
+          name: Image.gz-dtb
           path: kernel/out/arch/arm64/boot/Image.gz-dtb
+
+      - name: Upload flashable zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: AnyKernel3-enchilada
+          path: AnyKernel3-enchilada.zip
