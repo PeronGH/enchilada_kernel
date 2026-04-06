@@ -44,16 +44,21 @@ jobs:
           name: Image.gz-dtb
           path: kernel/out/arch/arm64/boot/Image.gz-dtb
 
+      - name: Setup magiskboot
+        run: |
+          gh release download v30.7 --repo topjohnwu/Magisk --pattern 'Magisk-*.apk' --dir /tmp
+          unzip -o /tmp/Magisk-*.apk lib/x86_64/libmagiskboot.so -d /tmp
+          install -m755 /tmp/lib/x86_64/libmagiskboot.so /usr/local/bin/magiskboot
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: Repack boot.img
         run: |
           mkdir boot && cd boot
           gh release download stock-boot --pattern boot.img
-          gh release download v30.7 --repo topjohnwu/Magisk --pattern 'Magisk-*.apk'
-          unzip -o Magisk-*.apk lib/x86_64/libmagiskboot.so
-          chmod 755 lib/x86_64/libmagiskboot.so
-          lib/x86_64/libmagiskboot.so unpack boot.img
+          magiskboot unpack boot.img
           cp ../kernel/out/arch/arm64/boot/Image.gz-dtb kernel
-          lib/x86_64/libmagiskboot.so repack boot.img new-boot.img
+          magiskboot repack boot.img new-boot.img
         env:
           GH_TOKEN: ${{ github.token }}
 
