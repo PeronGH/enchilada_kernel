@@ -1,0 +1,21 @@
+name: Build Kernel
+on: [workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Build
+        uses: dabao1955/kernel_build_action@main
+        with:
+          kernel-url: https://github.com/EdwinMoq/android_kernel_oneplus_sdm845
+          kernel-branch: lineage-23.2-4.19
+          config: vendor/enchilada_defconfig
+          arch: arm64
+          aosp-gcc: true
+          aosp-clang: true
+          aosp-clang-version: r416183b
+          ksu: true
+          lxc: true
+          anykernel3: true
+          release: true
+          access-token: ${{ secrets.GITHUB_TOKEN }}
