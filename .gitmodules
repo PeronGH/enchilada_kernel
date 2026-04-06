@@ -18,7 +18,3 @@
 	url = https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9
 	branch = lineage-19.1
 	shallow = true
-[submodule "AnyKernel3"]
-	path = AnyKernel3
-	url = https://github.com/osm0sis/AnyKernel3
-	shallow = true
