@@ -12,8 +12,6 @@ jobs:
           config: vendor/enchilada_defconfig
           arch: arm64
           other-clang-url: https://github.com/ZyCromerZ/Clang/releases/download/15.0.7-20260208-release/Clang-15.0.7-20260208.tar.gz
-          other-gcc64-url: https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9
-          other-gcc32-url: https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9
           lxc: true
           anykernel3: true
           release: true
