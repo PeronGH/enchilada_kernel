@@ -25,32 +25,19 @@ jobs:
         run: |
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$GITHUB_WORKSPACE/gcc64/bin:$GITHUB_WORKSPACE/gcc32/bin:$PATH"
-          make -j$(nproc) O=out ARCH=arm64 \
-            CC=clang \
-            CLANG_TRIPLE=aarch64-linux-gnu- \
-            CROSS_COMPILE=aarch64-linux-android- \
-            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-            vendor/enchilada_defconfig
-          scripts/config --file out/.config \
-            -e PID_NS -e USER_NS -e NET_NS -e UTS_NS -e IPC_NS \
-            -e CGROUP_DEVICE \
-            -e FHANDLE -e CHECKPOINT_RESTORE \
-            -e MACVLAN -e VLAN_8021Q \
-            -e IP6_NF_NAT -e IP6_NF_TARGET_MASQUERADE \
-            -e NETFILTER_XT_TARGET_CHECKSUM \
-            -e UNIX_DIAG -e PACKET_DIAG -e NETLINK_DIAG
-          make -j$(nproc) O=out ARCH=arm64 \
-            CC=clang \
-            CLANG_TRIPLE=aarch64-linux-gnu- \
-            CROSS_COMPILE=aarch64-linux-android- \
-            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-            olddefconfig
+          export ARCH=arm64
+          export MAKE_OPTS="CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi-"
+          make -j$(nproc) O=out $MAKE_OPTS vendor/enchilada_defconfig
+          scripts/kconfig/merge_config.sh -m -O out out/.config \
+            "$GITHUB_WORKSPACE"/configs/*.config
+          make -j$(nproc) O=out $MAKE_OPTS olddefconfig
 
       - name: Build
         run: |
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$GITHUB_WORKSPACE/gcc64/bin:$GITHUB_WORKSPACE/gcc32/bin:$PATH"
-          make -j$(nproc) O=out ARCH=arm64 \
+          export ARCH=arm64
+          make -j$(nproc) O=out \
             CC=clang \
             CLANG_TRIPLE=aarch64-linux-gnu- \
             CROSS_COMPILE=aarch64-linux-android- \
