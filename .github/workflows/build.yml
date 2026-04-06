@@ -4,18 +4,17 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 1
+
       - name: Install deps
         run: |
           sudo apt-get update
           sudo apt-get install -y bc bison build-essential cpio device-tree-compiler \
             flex kmod libelf-dev libssl-dev libtfm-dev openssl python3
-
-      - name: Clone sources
-        run: |
-          git clone --depth=1 -b lineage-23.2-4.19 https://github.com/EdwinMoq/android_kernel_oneplus_sdm845 kernel
-          git clone --depth=1 -b lineage-20.0 https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b clang
-          git clone --depth=1 -b lineage-19.1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 gcc64
-          git clone --depth=1 -b lineage-19.1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 gcc32
 
       - name: Fix duplicate DTS label
         run: |
@@ -45,7 +44,6 @@ jobs:
 
       - name: Package with AnyKernel3
         run: |
-          git clone --depth=1 https://github.com/osm0sis/AnyKernel3
           sed -i AnyKernel3/anykernel.sh \
             -e 's/device.name1=.*/device.name1=enchilada/' \
             -e 's/device.name2=.*/device.name2=/' \
