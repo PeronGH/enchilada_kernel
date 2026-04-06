@@ -14,7 +14,6 @@ jobs:
           aosp-gcc: true
           aosp-clang: true
           aosp-clang-version: r416183b
-          ksu: true
           lxc: true
           anykernel3: true
           release: true
