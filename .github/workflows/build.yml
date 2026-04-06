@@ -39,7 +39,7 @@ jobs:
             CROSS_COMPILE_ARM32=arm-linux-androideabi-
 
       - name: Upload kernel image
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Image.gz-dtb
           path: kernel/out/arch/arm64/boot/Image.gz-dtb
@@ -59,7 +59,7 @@ jobs:
             /tmp/boot.img boot.img
 
       - name: Upload boot.img
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: boot.img
           path: boot.img
@@ -70,7 +70,7 @@ jobs:
             /tmp/boot.img boot-magisk.img --magisk
 
       - name: Upload boot.img (Magisk)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: boot-magisk.img
           path: boot-magisk.img
