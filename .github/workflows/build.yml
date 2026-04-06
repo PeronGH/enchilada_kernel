@@ -46,15 +46,14 @@ jobs:
 
       - name: Repack boot.img
         run: |
-          gh release download stock-boot --pattern boot.img --dir boot
-          gh release download v30.7 --repo topjohnwu/Magisk --pattern 'Magisk-*.apk' --dir boot
-          unzip -o boot/Magisk-*.apk lib/x86_64/libmagiskboot.so -d boot
-          chmod 755 boot/lib/x86_64/libmagiskboot.so
-          MAGISKBOOT=boot/lib/x86_64/libmagiskboot.so
-          cd boot
-          $GITHUB_WORKSPACE/$MAGISKBOOT unpack boot.img
-          cp $GITHUB_WORKSPACE/kernel/out/arch/arm64/boot/Image.gz-dtb kernel
-          $GITHUB_WORKSPACE/$MAGISKBOOT repack boot.img new-boot.img
+          mkdir boot && cd boot
+          gh release download stock-boot --pattern boot.img
+          gh release download v30.7 --repo topjohnwu/Magisk --pattern 'Magisk-*.apk'
+          unzip -o Magisk-*.apk lib/x86_64/libmagiskboot.so
+          chmod 755 lib/x86_64/libmagiskboot.so
+          lib/x86_64/libmagiskboot.so unpack boot.img
+          cp ../kernel/out/arch/arm64/boot/Image.gz-dtb kernel
+          lib/x86_64/libmagiskboot.so repack boot.img new-boot.img
         env:
           GH_TOKEN: ${{ github.token }}
 
