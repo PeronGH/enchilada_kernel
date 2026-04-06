@@ -17,6 +17,9 @@ jobs:
           git clone --depth=1 -b lineage-19.1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 gcc64
           git clone --depth=1 -b lineage-19.1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 gcc32
 
+      - name: Fix duplicate DTS label
+        run: sed -i 's/qnovo_fet_ctrl_default: qnovo_fet_ctrl_default {/qnovo_fet_ctrl_default {/' kernel/arch/arm64/boot/dts/qcom/fajita.dtsi
+
       - name: Build
         run: |
           cd kernel
