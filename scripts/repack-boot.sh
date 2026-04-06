@@ -8,10 +8,10 @@
 
 set -euo pipefail
 
-MAGISK_DIR="$1"
-KERNEL="$2"
-STOCK_BOOT="$3"
-OUTPUT="$4"
+MAGISK_DIR="$(realpath "$1")"
+KERNEL="$(realpath "$2")"
+STOCK_BOOT="$(realpath "$3")"
+OUTPUT="$(realpath -m "$4")"
 PATCH_MAGISK=false
 
 [ "${5:-}" = "--magisk" ] && PATCH_MAGISK=true
