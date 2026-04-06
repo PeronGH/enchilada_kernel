@@ -18,7 +18,8 @@ jobs:
           git clone --depth=1 -b lineage-19.1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 gcc32
 
       - name: Fix duplicate DTS label
-        run: sed -i 's/qnovo_fet_ctrl_default: qnovo_fet_ctrl_default {/qnovo_fet_ctrl_default {/' kernel/arch/arm64/boot/dts/qcom/fajita.dtsi
+        run: |
+          sed -i 's/qnovo_fet_ctrl_default: qnovo_fet_ctrl_default {/qnovo_fet_ctrl_default {/' kernel/arch/arm64/boot/dts/qcom/fajita.dtsi
 
       - name: Build
         run: |
@@ -34,7 +35,7 @@ jobs:
             CC=clang \
             CLANG_TRIPLE=aarch64-linux-gnu- \
             CROSS_COMPILE=aarch64-linux-android- \
-            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
+            CROSS_COMPILE_ARM32=arm-linux-androideabi-
 
       - name: Upload kernel image
         uses: actions/upload-artifact@v4
