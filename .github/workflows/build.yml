@@ -2,7 +2,7 @@ name: Build Kernel
 on: [push, workflow_dispatch]
 jobs:
   build:
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-22.04
     steps:
       - name: Install deps
         run: |
@@ -10,14 +10,28 @@ jobs:
           sudo apt-get install -y bc bison build-essential cpio device-tree-compiler \
             flex kmod libelf-dev libssl-dev libtfm-dev openssl python3
 
-      - name: Clone kernel
-        run: git clone --depth=1 -b lineage-23.2-4.19 https://github.com/EdwinMoq/android_kernel_oneplus_sdm845 kernel
+      - name: Clone sources
+        run: |
+          git clone --depth=1 -b lineage-23.2-4.19 https://github.com/EdwinMoq/android_kernel_oneplus_sdm845 kernel
+          git clone --depth=1 -b lineage-20.0 https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b clang
+          git clone --depth=1 -b lineage-19.1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 gcc64
+          git clone --depth=1 -b lineage-19.1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 gcc32
 
       - name: Build
         run: |
           cd kernel
-          make -j$(nproc) O=out ARCH=arm64 vendor/enchilada_defconfig
-          make -j$(nproc) O=out ARCH=arm64
+          export PATH="$GITHUB_WORKSPACE/clang/bin:$GITHUB_WORKSPACE/gcc64/bin:$GITHUB_WORKSPACE/gcc32/bin:$PATH"
+          make -j$(nproc) O=out ARCH=arm64 \
+            CC=clang \
+            CLANG_TRIPLE=aarch64-linux-gnu- \
+            CROSS_COMPILE=aarch64-linux-android- \
+            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
+            vendor/enchilada_defconfig
+          make -j$(nproc) O=out ARCH=arm64 \
+            CC=clang \
+            CLANG_TRIPLE=aarch64-linux-gnu- \
+            CROSS_COMPILE=aarch64-linux-android- \
+            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
 
       - name: Upload
         uses: actions/upload-artifact@v4
