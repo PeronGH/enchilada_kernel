@@ -11,8 +11,8 @@ jobs:
           kernel-branch: lineage-23.2-4.19
           config: vendor/enchilada_defconfig
           arch: arm64
+          other-clang-url: https://github.com/ZyCromerZ/Clang/releases/download/15.0.7-20260208-release/Clang-15.0.7-20260208.tar.gz
           aosp-gcc: true
-          other-clang-url: https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master-kernel-build-2021/clang-r416183b.tar.gz
           lxc: true
           anykernel3: true
           release: true
