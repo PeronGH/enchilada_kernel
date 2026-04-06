@@ -16,10 +16,6 @@ jobs:
           sudo apt-get install -y bc bison build-essential cpio device-tree-compiler \
             flex kmod libelf-dev libssl-dev libtfm-dev openssl python3
 
-      - name: Fix duplicate DTS label
-        run: |
-          sed -i 's/qnovo_fet_ctrl_default: qnovo_fet_ctrl_default {/qnovo_fet_ctrl_default {/' kernel/arch/arm64/boot/dts/qcom/fajita.dtsi
-
       - name: Configure kernel
         run: |
           cd kernel
