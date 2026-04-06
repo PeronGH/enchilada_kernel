@@ -1,32 +1,22 @@
 #!/bin/bash
 # Repack stock boot.img with a custom kernel, optionally with Magisk.
 #
-# Usage: repack-boot.sh <kernel> <stock-boot> <output> [--magisk <magisk-dir>]
+# Usage: repack-boot.sh <magisk-dir> <kernel> <stock-boot> <output> [--magisk]
 #
-# magisk-dir must contain: libmagiskboot.so, libmagiskinit.so, libmagisk.so,
-#                          libinit-ld.so, stub.apk
-#
-# Set MAGISKBOOT to override the path to magiskboot binary.
+# magisk-dir is an extracted Magisk APK (contains lib/ and assets/).
+# --magisk patches Magisk root into the boot image.
 
 set -euo pipefail
 
-KERNEL="$1"
-STOCK_BOOT="$2"
-OUTPUT="$3"
-MAGISK_DIR=""
+MAGISK_DIR="$1"
+KERNEL="$2"
+STOCK_BOOT="$3"
+OUTPUT="$4"
+PATCH_MAGISK=false
 
-if [ "${4:-}" = "--magisk" ]; then
-  MAGISK_DIR="$5"
-fi
+[ "${5:-}" = "--magisk" ] && PATCH_MAGISK=true
 
-# Find magiskboot: explicit env, magisk-dir, or PATH
-if [ -z "${MAGISKBOOT:-}" ]; then
-  if [ -n "$MAGISK_DIR" ] && [ -x "$MAGISK_DIR/libmagiskboot.so" ]; then
-    MAGISKBOOT="$MAGISK_DIR/libmagiskboot.so"
-  else
-    MAGISKBOOT="magiskboot"
-  fi
-fi
+MAGISKBOOT="$MAGISK_DIR/lib/x86_64/libmagiskboot.so"
 
 WORKDIR=$(mktemp -d)
 trap 'rm -rf "$WORKDIR"' EXIT
@@ -35,12 +25,12 @@ cd "$WORKDIR"
 "$MAGISKBOOT" unpack "$STOCK_BOOT"
 cp "$KERNEL" kernel
 
-if [ -n "$MAGISK_DIR" ]; then
+if $PATCH_MAGISK; then
   cp ramdisk.cpio ramdisk.cpio.orig
-  cp "$MAGISK_DIR/libmagiskinit.so" magiskinit
-  cp "$MAGISK_DIR/libmagisk.so" magisk
-  cp "$MAGISK_DIR/libinit-ld.so" init-ld
-  cp "$MAGISK_DIR/stub.apk" stub.apk
+  cp "$MAGISK_DIR/lib/arm64-v8a/libmagiskinit.so" magiskinit
+  cp "$MAGISK_DIR/lib/arm64-v8a/libmagisk.so" magisk
+  cp "$MAGISK_DIR/lib/arm64-v8a/libinit-ld.so" init-ld
+  cp "$MAGISK_DIR/assets/stub.apk" stub.apk
 
   "$MAGISKBOOT" compress=xz magisk magisk.xz
   "$MAGISKBOOT" compress=xz stub.apk stub.xz
