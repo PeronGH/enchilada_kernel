@@ -1,5 +1,5 @@
 name: Build Kernel
-on: [workflow_dispatch]
+on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -12,8 +12,7 @@ jobs:
           config: vendor/enchilada_defconfig
           arch: arm64
           aosp-gcc: true
-          aosp-clang: true
-          aosp-clang-version: r416183b
+          other-clang-url: https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master-kernel-build-2021/clang-r416183b.tar.gz
           lxc: true
           anykernel3: true
           release: true
