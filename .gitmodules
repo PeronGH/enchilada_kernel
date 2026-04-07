@@ -3,8 +3,3 @@
 	url = https://github.com/PeronGH/android_kernel_oneplus_sdm845
 	branch = lineage-23.2-4.19
 	shallow = true
-[submodule "clang"]
-	path = clang
-	url = https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b
-	branch = lineage-20.0
-	shallow = true

@@ -19,12 +19,12 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y bc bison build-essential cpio device-tree-compiler \
-            flex kmod libelf-dev libssl-dev libtfm-dev openssl python3
+            flex kmod libelf-dev libssl-dev libtfm-dev openssl python3 \
+            clang lld llvm
 
       - name: Configure kernel
         run: |
           cd kernel
-          export PATH="$GITHUB_WORKSPACE/clang/bin:$PATH"
           make -j$(nproc) O=out $MAKE_OPTS vendor/enchilada_defconfig
           scripts/kconfig/merge_config.sh -m -O out out/.config \
             "$GITHUB_WORKSPACE"/configs/*.config
@@ -33,7 +33,6 @@ jobs:
       - name: Build
         run: |
           cd kernel
-          export PATH="$GITHUB_WORKSPACE/clang/bin:$PATH"
           make -j$(nproc) O=out $MAKE_OPTS KCFLAGS="-mcpu=cortex-a75"
 
       - name: Upload kernel image
