@@ -4,7 +4,10 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     env:
+      ARCH: arm64
       MAKE_OPTS: LLVM=1 LLVM_IAS=1
+      KERNEL_IMG: kernel/out/arch/arm64/boot/Image.gz-dtb
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -22,7 +25,6 @@ jobs:
         run: |
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$PATH"
-          export ARCH=arm64
           make -j$(nproc) O=out $MAKE_OPTS vendor/enchilada_defconfig
           scripts/kconfig/merge_config.sh -m -O out out/.config \
             "$GITHUB_WORKSPACE"/configs/*.config
@@ -32,14 +34,13 @@ jobs:
         run: |
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$PATH"
-          export ARCH=arm64
           make -j$(nproc) O=out $MAKE_OPTS KCFLAGS="-mcpu=cortex-a75"
 
       - name: Upload kernel image
         uses: actions/upload-artifact@v7
         with:
           name: kernel
-          path: kernel/out/arch/arm64/boot/Image.gz-dtb
+          path: ${{ env.KERNEL_IMG }}
 
       - name: Setup Magisk
         run: |
@@ -47,12 +48,10 @@ jobs:
           unzip -o /tmp/magisk/Magisk-*.apk -d /tmp/magisk
           chmod 755 /tmp/magisk/lib/x86_64/libmagiskboot.so
           gh release download stock-boot --pattern boot.img --dir /tmp
-        env:
-          GH_TOKEN: ${{ github.token }}
 
       - name: Repack boot.img
         run: |
-          scripts/repack-boot.sh /tmp/magisk kernel/out/arch/arm64/boot/Image.gz-dtb \
+          scripts/repack-boot.sh /tmp/magisk $KERNEL_IMG \
             /tmp/boot.img boot.img
 
       - name: Upload boot.img
@@ -63,7 +62,7 @@ jobs:
 
       - name: Repack boot.img (Magisk)
         run: |
-          scripts/repack-boot.sh /tmp/magisk kernel/out/arch/arm64/boot/Image.gz-dtb \
+          scripts/repack-boot.sh /tmp/magisk $KERNEL_IMG \
             /tmp/boot.img boot-magisk.img --magisk
 
       - name: Upload boot.img (Magisk)
