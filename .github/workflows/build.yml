@@ -21,7 +21,7 @@ jobs:
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$PATH"
           export ARCH=arm64
-          export MAKE_OPTS="LLVM=1 LLVM_IAS=0"
+          export MAKE_OPTS="LLVM=1 LLVM_IAS=1"
           make -j$(nproc) O=out $MAKE_OPTS vendor/enchilada_defconfig
           scripts/kconfig/merge_config.sh -m -O out out/.config \
             "$GITHUB_WORKSPACE"/configs/*.config
@@ -32,7 +32,7 @@ jobs:
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$PATH"
           export ARCH=arm64
-          make -j$(nproc) O=out LLVM=1 LLVM_IAS=0 \
+          make -j$(nproc) O=out LLVM=1 LLVM_IAS=1 \
             KCFLAGS="-mcpu=cortex-a75"
 
       - name: Upload kernel image
