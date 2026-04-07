@@ -3,6 +3,8 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-24.04
+    env:
+      MAKE_OPTS: LLVM=1 LLVM_IAS=1
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -21,7 +23,6 @@ jobs:
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$PATH"
           export ARCH=arm64
-          export MAKE_OPTS="LLVM=1 LLVM_IAS=1"
           make -j$(nproc) O=out $MAKE_OPTS vendor/enchilada_defconfig
           scripts/kconfig/merge_config.sh -m -O out out/.config \
             "$GITHUB_WORKSPACE"/configs/*.config
@@ -32,8 +33,7 @@ jobs:
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$PATH"
           export ARCH=arm64
-          make -j$(nproc) O=out LLVM=1 LLVM_IAS=1 \
-            KCFLAGS="-mcpu=cortex-a75"
+          make -j$(nproc) O=out $MAKE_OPTS KCFLAGS="-mcpu=cortex-a75"
 
       - name: Upload kernel image
         uses: actions/upload-artifact@v7
