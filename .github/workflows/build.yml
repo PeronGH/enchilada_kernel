@@ -37,7 +37,7 @@ jobs:
             CLANG_TRIPLE=aarch64-linux-gnu- \
             CROSS_COMPILE=aarch64-linux-android- \
             CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-            KCFLAGS="-mcpu=cortex-a75.cortex-a55"
+            KCFLAGS="-mcpu=cortex-a75"
 
       - name: Upload kernel image
         uses: actions/upload-artifact@v7
