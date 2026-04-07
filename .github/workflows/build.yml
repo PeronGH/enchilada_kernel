@@ -21,7 +21,7 @@ jobs:
           cd kernel
           export PATH="$GITHUB_WORKSPACE/clang/bin:$GITHUB_WORKSPACE/gcc64/bin:$GITHUB_WORKSPACE/gcc32/bin:$PATH"
           export ARCH=arm64
-          export MAKE_OPTS="CC=clang CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi-"
+          export MAKE_OPTS="CC=clang LD=ld.lld CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi-"
           make -j$(nproc) O=out $MAKE_OPTS vendor/enchilada_defconfig
           scripts/kconfig/merge_config.sh -m -O out out/.config \
             "$GITHUB_WORKSPACE"/configs/*.config
@@ -34,6 +34,7 @@ jobs:
           export ARCH=arm64
           make -j$(nproc) O=out \
             CC=clang \
+            LD=ld.lld \
             CLANG_TRIPLE=aarch64-linux-gnu- \
             CROSS_COMPILE=aarch64-linux-android- \
             CROSS_COMPILE_ARM32=arm-linux-androideabi- \
